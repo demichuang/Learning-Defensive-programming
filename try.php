@@ -5,13 +5,15 @@ class Daemon
     public function start()
     {
         $pid = pcntl_fork();
+        $log = './var/log/try.log';
 
         if ($pid == -1) {
             echo "Fork Fail!";
+            file_put_contents($log, "Fork Fail!\n", FILE_APPEND);
         }
 
         if ($pid) {
-            // against Zombie children
+            // against zombie children
             pcntl_wait($status);
             exit;
         }
@@ -21,6 +23,7 @@ class Daemon
 
         if ($pid == -1) {
             echo "Fork Fail!";
+            file_put_contents($log, "Fork Fail!\n", FILE_APPEND);
         }
 
         if ($pid) {
@@ -34,15 +37,22 @@ class Daemon
 
     public function echoSomething()
     {
+        $log = './var/log/try.log';
+
+        echo "After start try.php ...\n";
+        file_put_contents($log, "After start try.php ...\n", FILE_APPEND);
+
         for ($i = 0; $i < 5; $i++) {
             $pid = pcntl_fork();
 
             if ($pid == -1) {
                 echo "Fork Fail!";
+                file_put_contents($log, "Fork Fail!\n", FILE_APPEND);
             }
 
             if (!$pid) {
                 echo "child pid " . posix_getpid() . "\n";
+                file_put_contents($log, "Get child pid " . posix_getpid() . "\n", FILE_APPEND);
                 exit;
             }
         }
@@ -50,5 +60,4 @@ class Daemon
 }
 
 $http = new Daemon();
-
 $http->start();
